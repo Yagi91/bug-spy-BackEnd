@@ -1,3 +1,6 @@
+// Helper function that extracts the error message from the MongoDB error object.
+//TODO: make error messages more friendly
+
 const getMessageError = (err) => {
   let message = "";
   if (err.code) {
