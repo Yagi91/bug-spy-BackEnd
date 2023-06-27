@@ -1,7 +1,7 @@
 // Helper function that extracts the error message from the MongoDB error object.
 //TODO: make error messages more friendly
 
-const getMessageError = (err) => {
+const getErrorMessage = (err) => {
   let message = "";
   if (err.code) {
     switch (err.code) {
@@ -38,4 +38,4 @@ const getUniqueErrorMessage = (err) => {
   return output;
 };
 
-module.exports = getMessageError;
+module.exports = getErrorMessage;
