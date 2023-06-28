@@ -38,4 +38,4 @@ const getUniqueErrorMessage = (err) => {
   return output;
 };
 
-module.exports = getErrorMessage;
+module.exports = { getErrorMessage };
