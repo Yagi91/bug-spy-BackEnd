@@ -5,6 +5,13 @@ const errorHandler = require("../helpers/dbErrorHandler");
 //create a new user in the database as a user object
 //TODO: prevent creating a user with the same email as an existing user
 const create = async (req, res) => {
+  const userExist = await User.exists({ email: req.body.email });
+  console.log("user-exist:", userExist);
+  if (userExist)
+    return res
+      .status(400)
+      .json({ error: "A user with this email already exist." });
+
   const user = new User(req.body); //TODO: edit the req.body to ensure the fields frontend sends are the same as the ones in the model
   console.log("in create", req.body);
   try {
