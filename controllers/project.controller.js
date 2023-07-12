@@ -4,7 +4,7 @@ const errorHandler = require("../helpers/dbErrorHandler");
 
 const create = async (req, res) => {
   console.log("in create");
-  const ProjectExist = Project.exists({ name: req.body.name });
+  const ProjectExist = await Project.exists({ name: req.body.name });
   if (ProjectExist) {
     return res
       .status(400)
@@ -84,7 +84,7 @@ const remove = async (req, res) => {
   }
 };
 
-module.export = {
+module.exports = {
   create,
   projectByID,
   read,
