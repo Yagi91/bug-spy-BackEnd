@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     // type: "Developer|Lead|Tester|Manager",
     // enum: ["Developer", "Lead", "Tester", "Manager"],
-    default: "developer",
+    default: "Developer",
   },
   created: {
     type: Date,
@@ -33,7 +33,6 @@ const UserSchema = new mongoose.Schema({
 });
 
 //UserSchema.virtual is a Mongoose getter function that allows us to define a virtual field on our schema.
-//
 UserSchema.virtual("password")
   .set(function (password) {
     // create a temporary variable called _password

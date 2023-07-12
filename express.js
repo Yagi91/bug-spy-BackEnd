@@ -17,6 +17,7 @@ app.use(helmet());
 
 app.use("/", require("./routes/user.routes"));
 app.use("/", require("./routes/auth.routes"));
+app.use("/", require("./routes/project.routes"));
 
 // Catch unauthorized errors
 app.use((err, req, res, next) => {

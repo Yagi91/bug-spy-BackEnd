@@ -14,7 +14,7 @@ const signin = async (req, res) => {
     } //TODO: change error message to something more secure like "Wrong email or password" or "Invalid email or password"
 
     const token = jwt.sign({ _id: user._id }, config.jwtSecret);
-    res.cookie("t", token, { expire: new Date() + 9999 }); //the cookie will expire in 9999 seconds which is about 2.7 hours, "t" is the name of the cookie, token is the value of the cookie, and the cookie will be sent in an HTTP-only cookie which is the default for the cookie-parser module
+    res.cookie("t", token, { expire: new Date() + 9999 }); //cookie expires in about 2.7 hours, "t" is the name of the cookie, token is cookie value, and the cookie is HTTP-only cookie which is the default for the cookie-parser module
 
     return res.json({
       token,
