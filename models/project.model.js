@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const ObjectId = mongoose.Schema.Types.ObjectId;
+
 const ProjectSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -23,6 +25,9 @@ const ProjectSchema = new mongoose.Schema({
   },
   members: {
     type: [String],
+  },
+  bug: {
+    type: [ObjectId],
   },
   created: {
     type: Date,

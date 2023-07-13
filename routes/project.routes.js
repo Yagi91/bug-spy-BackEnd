@@ -5,14 +5,12 @@ const router = express.Router();
 
 router.route("/api/projects").get(projectCtrl.list).post(projectCtrl.create);
 
-// router.route("/api/users").get(userCtrl.list).post(userCtrl.create);
+router
+  .route("/api/users/projects/:projectId")
+  .get(projectCtrl.read)
+  .put(projectCtrl.update)
+  .delete(projectCtrl.remove);
 
-// router
-//   .route("/api/users/projects/:projectId")
-//   .get(projectCtrl.read)
-//   .put(projectCtrl.update)
-//   .delete(projectCtrl.remove);
-
-// router.param("projectId", projectCtrl.projectByID);
+router.param("projectId", projectCtrl.projectByID);
 
 module.exports = router;
