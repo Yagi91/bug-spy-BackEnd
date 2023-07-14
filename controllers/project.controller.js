@@ -26,7 +26,7 @@ const create = async (req, res) => {
 const list = async (req, res) => {
   try {
     const projects = await Project.find().select(
-      "_id name admin bugs updated created description"
+      "_id name admin totalBugs created description progress"
     );
     return res.json(projects);
   } catch (err) {

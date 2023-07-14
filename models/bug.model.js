@@ -1,5 +1,12 @@
 const mongoose = require("mongoose");
 
+const ObjectId = mongoose.Schema.Types.ObjectId;
+
+// const UserSchema = new mongoose.Schema({
+//   name: String,
+//   id: ObjectId,
+// });
+
 const BugSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -28,8 +35,12 @@ const BugSchema = new mongoose.Schema({
     required: "Project name is required",
   },
   assignedTo: {
-    type: String,
+    type: ObjectId,
     required: "Name of assigned developer required",
+  },
+  createdBy: {
+    type: ObjectId,
+    required: "Name of creator required",
   },
   created: {
     type: Date,

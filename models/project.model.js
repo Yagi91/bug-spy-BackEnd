@@ -2,6 +2,19 @@ const mongoose = require("mongoose");
 
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
+// const UserSchema = new mongoose.Schema({
+//   name: {
+//     type: String,
+//     trim: true,
+//     required: "Name is required",
+//   },
+//   id: {
+//     type: String,
+//     trim: true,
+//     required: "ID is required",
+//   },
+// });
+
 const ProjectSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -21,13 +34,17 @@ const ProjectSchema = new mongoose.Schema({
   },
   admin: {
     type: String,
-    required: "Name of project admin required",
+    required: "Admin name is required",
   },
   members: {
     type: [String],
   },
-  bug: {
+  bugs: {
     type: [ObjectId],
+  },
+  totalBugs: {
+    type: Number,
+    default: 0,
   },
   created: {
     type: Date,

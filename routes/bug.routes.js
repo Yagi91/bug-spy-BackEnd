@@ -12,3 +12,5 @@ router
   .delete(bugCtrl.remove);
 
 router.param("bugId", bugCtrl.bugByID);
+
+module.exports = router;
