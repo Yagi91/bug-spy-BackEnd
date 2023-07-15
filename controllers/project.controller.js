@@ -23,7 +23,7 @@ const create = async (req, res) => {
       created: project.created,
     });
   } catch (err) {
-    return res.status(400).json({ error: errorHandler(err) });
+    return res.status(400).json({ error: errorHandler.getErrorMessage(err) });
   }
 };
 
@@ -35,7 +35,7 @@ const list = async (req, res) => {
     return res.json(projects);
   } catch (err) {
     return res.status(400).json({
-      error: errorHandler(err),
+      error: errorHandler.getErrorMessage(err),
     });
   }
 };
@@ -71,7 +71,7 @@ const update = async (req, res) => {
     res.json(project);
   } catch (err) {
     return res.status(400).json({
-      error: "Could not retrieve user",
+      error: errorHandler.getErrorMessage(err),
     });
   }
 };
