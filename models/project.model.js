@@ -30,7 +30,6 @@ const ProjectSchema = new mongoose.Schema({
     type: String,
     enum: ["Completed", "Ongoing"],
     default: "Ongoing",
-    required: "Current Project Progress is required",
   },
   admin: {
     type: String,

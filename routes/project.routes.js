@@ -7,10 +7,10 @@ const router = express.Router();
 router.route("/api/projects").get(projectCtrl.list).post(projectCtrl.create);
 
 router
-  .route("/api/users/projects/:projectId")
-  .get(authCtrl.requireSignin, projectCtrl.read)
-  .put(authCtrl.requireSignin, projectCtrl.update)
-  .delete(authCtrl.requireSignin, projectCtrl.remove);
+  .route("/api/projects/:projectId")
+  .get(projectCtrl.read)
+  .put(projectCtrl.update)
+  .delete(projectCtrl.remove);
 
 router.param("projectId", projectCtrl.projectByID);
 

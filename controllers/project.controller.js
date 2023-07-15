@@ -13,10 +13,14 @@ const create = async (req, res) => {
   const project = new Project(req.body);
   try {
     await project.save();
-    console.log(project);
+    console.log("Successfully created", project);
     return res.status(200).json({
-      message: "Project created successfully",
-      project,
+      name: project.name,
+      _id: project._id,
+      progress: project.progress,
+      admin: project.admin,
+      totalBugs: project.totalBugs,
+      created: project.created,
     });
   } catch (err) {
     return res.status(400).json({ error: errorHandler(err) });
@@ -38,8 +42,9 @@ const list = async (req, res) => {
 
 const projectByID = async (req, res, next, id) => {
   try {
-    let project = user.findByID(id);
-    if (!user) {
+    let project = await Project.findById(id);
+    console.log("retrieved project", project);
+    if (!project) {
       res.status(404).json({
         error: "Project not found",
       });
@@ -62,7 +67,7 @@ const update = async (req, res) => {
     let project = req.project;
     project = extend(project, req.body);
     project.updated = Date.now();
-    await user.save();
+    await project.save();
     res.json(project);
   } catch (err) {
     return res.status(400).json({
@@ -76,7 +81,7 @@ const remove = async (req, res) => {
   try {
     let project = req.project;
     let deletedProject = await Project.deleteOne({ _id: project._id });
-    res.json(deletedProject);
+    res.json(deletedProject); // an object with acknowledged and deletedCount keys
   } catch (err) {
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
