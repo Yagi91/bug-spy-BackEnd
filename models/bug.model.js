@@ -6,6 +6,10 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 //   name: String,
 //   id: ObjectId,
 // });
+const ProjectSchema = new mongoose.Schema({
+  name: String,
+  id: ObjectId,
+});
 
 const BugSchema = new mongoose.Schema({
   name: {
@@ -30,10 +34,7 @@ const BugSchema = new mongoose.Schema({
     default: "Open",
     required: "Status is required",
   },
-  project: {
-    type: String,
-    required: "Project name is required",
-  },
+  project: ProjectSchema,
   assignedTo: {
     type: ObjectId,
     required: "Name of assigned developer required",
