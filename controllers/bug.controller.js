@@ -5,8 +5,9 @@ const errorHandler = require("../helpers/dbErrorHandler.js");
 
 const create = async (req, res) => {
   console.log("in create");
+  // req.body.project = ObjectId(req.body.project);
   const bug = new Bug(req.body);
-  const project = await Project.findById(bug.project.id);
+  const project = await Project.findById(req.body.project);
   if (!project) {
     return res
       .status(400)
@@ -23,6 +24,7 @@ const create = async (req, res) => {
       bug,
     });
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ error: errorHandler(err) });
   }
 };
@@ -43,7 +45,7 @@ const list = async (req, res) => {
 const bugByID = async (req, res, next, id) => {
   try {
     let bug = await Bug.findById(id);
-    let project = await Project.findById(bug.project.id);
+    let project = await Project.findById(bug.project.toString());
     if (!bug) {
       return res.status(404).json({
         error: "Bug not found",
@@ -86,7 +88,9 @@ const remove = async (req, res) => {
   try {
     let bug = req.bug;
     let project = req.project;
-    let updatedProjectBugs = project.bugs.filter((_id) => bug_id !== _id);
+    let updatedProjectBugs = project.bugs.filter(
+      (_id) => bug.project.toString() !== _id.toString()
+    );
     project.bugs = updatedProjectBugs;
     project.totalBugs -= 1;
     await project.save();

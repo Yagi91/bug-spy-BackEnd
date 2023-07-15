@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const ObjectId = mongoose.Schema.Types.ObjectId;
+const ObjectId = mongoose.Types.ObjectId;
 
 // const UserSchema = new mongoose.Schema({
 //   name: String,
@@ -34,14 +34,17 @@ const BugSchema = new mongoose.Schema({
     default: "Open",
     required: "Status is required",
   },
-  project: ProjectSchema,
+  project: {
+    type: String,
+    required: "Referenced project id is required",
+  },
   assignedTo: {
     type: ObjectId,
-    required: "Name of assigned developer required",
+    // required: "Name of assigned developer required",
   },
   createdBy: {
     type: ObjectId,
-    required: "Name of creator required",
+    // required: "Name of creator required",
   },
   created: {
     type: Date,
@@ -50,6 +53,11 @@ const BugSchema = new mongoose.Schema({
   updated: {
     type: Date,
   },
+});
+
+BugSchema.pre("save", async function (next) {
+  this.bugs = new ObjectId(this.project);
+  next();
 });
 
 module.exports = mongoose.model("Bug", BugSchema);
