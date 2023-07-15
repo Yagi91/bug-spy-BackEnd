@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
 
+const ObjectId = mongoose.Types.ObjectId;
+
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -16,13 +18,16 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    // type: "Developer|Lead|Tester|Manager",
     // enum: ["Developer", "Lead", "Tester", "Manager"],
     default: "Developer",
+    required: "Role is required",
   },
   created: {
     type: Date,
     default: Date.now,
+  },
+  bugs: {
+    type: [ObjectId],
   },
   updated: Date,
   hashed_password: {

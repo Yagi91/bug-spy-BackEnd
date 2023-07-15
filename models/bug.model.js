@@ -6,10 +6,10 @@ const ObjectId = mongoose.Types.ObjectId;
 //   name: String,
 //   id: ObjectId,
 // });
-const ProjectSchema = new mongoose.Schema({
-  name: String,
-  id: ObjectId,
-});
+// const ProjectSchema = new mongoose.Schema({
+//   name: String,
+//   id: ObjectId,
+// });
 
 const BugSchema = new mongoose.Schema({
   name: {
@@ -38,13 +38,9 @@ const BugSchema = new mongoose.Schema({
     type: String,
     required: "Referenced project id is required",
   },
-  assignedTo: {
+  assignee: {
     type: ObjectId,
-    // required: "Name of assigned developer required",
-  },
-  createdBy: {
-    type: ObjectId,
-    // required: "Name of creator required",
+    required: "Name of assigned developer required",
   },
   created: {
     type: Date,
@@ -57,6 +53,7 @@ const BugSchema = new mongoose.Schema({
 
 BugSchema.pre("save", async function (next) {
   this.bugs = new ObjectId(this.project);
+  this.assignee = new ObjectId(this.assignee);
   next();
 });
 
