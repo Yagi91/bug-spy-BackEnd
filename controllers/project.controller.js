@@ -3,7 +3,7 @@ const extend = require("lodash/extend");
 const errorHandler = require("../helpers/dbErrorHandler");
 
 const create = async (req, res) => {
-  console.log("in create");
+  console.log("in create", req.body.memebers);
   const ProjectExist = await Project.exists({ name: req.body.name });
   if (ProjectExist) {
     return res
@@ -57,9 +57,38 @@ const projectByID = async (req, res, next, id) => {
     });
   }
 };
+const projectByName = async (req, res, next, name) => {
+  try {
+    let project = await Project.findOne({ name: name });
+    console.log("retrieved project", project);
+    if (!project) {
+      res.status(404).json({
+        error: "Project not found",
+      });
+    }
+    req.project = project;
+    next();
+  } catch (err) {
+    return res.status(400).json({
+      error: "Could not retrieve user",
+    });
+  }
+};
 
-const read = (req, res) => {
-  return res.json(req.project);
+const read = async (req, res) => {
+  const project = await Project.findOne({ _id: req.project._id })
+    .populate({
+      path: "bugs",
+      // populate: {
+      //   path: "assignedTo",
+      //   select: "name",
+      // },
+      select: "name description status priority status created updated _id",
+    })
+    .exec();
+
+  // return res.json(req.project);
+  return res.json(project);
 };
 
 const update = async (req, res) => {
@@ -92,6 +121,7 @@ const remove = async (req, res) => {
 module.exports = {
   create,
   projectByID,
+  projectByName,
   read,
   list,
   remove,

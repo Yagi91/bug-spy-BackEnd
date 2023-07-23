@@ -6,8 +6,6 @@ const User = require("../models/user.model.js");
 const referenceSwap = require("../helpers/ReferenceSwap.js");
 
 const create = async (req, res) => {
-  console.log("in create");
-  // req.body.project = ObjectId(req.body.project);
   const bug = new Bug(req.body);
   const project = await Project.findById(req.body.project);
   const assignee = await User.findById(req.body.assignee);

@@ -40,6 +40,7 @@ const ProjectSchema = new mongoose.Schema({
   },
   bugs: {
     type: [ObjectId],
+    ref: "Bug",
   },
   totalBugs: {
     type: Number,

@@ -12,6 +12,9 @@ router
   .put(projectCtrl.update)
   .delete(projectCtrl.remove);
 
+router.route("/api/projects/details/:projectName").get(projectCtrl.read);
+
 router.param("projectId", projectCtrl.projectByID);
+router.param("projectName", projectCtrl.projectByName);
 
 module.exports = router;
