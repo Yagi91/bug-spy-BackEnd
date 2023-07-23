@@ -85,9 +85,12 @@ const read = async (req, res) => {
       // },
       select: "name description status priority status created updated _id",
     })
+    .populate({
+      path: "members",
+      select: "name _id role",
+    })
     .exec();
 
-  // return res.json(req.project);
   return res.json(project);
 };
 
