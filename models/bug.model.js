@@ -51,9 +51,18 @@ const BugSchema = new mongoose.Schema({
   },
 });
 
+BugSchema.set("validateBeforeSave", false);
+
 BugSchema.pre("save", async function (next) {
+  console.log("in here");
   this.bugs = new ObjectId(this.project);
   this.assignee = new ObjectId(this.assignee);
+  this.priority =
+    this.priority[0].toUpperCase() + this.priority.slice(1).toLowerCase();
+  this.status =
+    this.status[0].toUpperCase() + this.status.slice(1).toLowerCase();
+  console.log("bug status", this.status);
+  this.validate();
   next();
 });
 

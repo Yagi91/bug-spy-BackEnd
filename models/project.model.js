@@ -43,4 +43,9 @@ const ProjectSchema = new mongoose.Schema({
   },
 });
 
+ProjectSchema.pre("save", async function (next) {
+  this.bugs = new ObjectId(this.bugs);
+  next();
+});
+
 module.exports = mongoose.model("Project", ProjectSchema);

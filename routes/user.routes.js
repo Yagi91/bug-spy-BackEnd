@@ -6,6 +6,11 @@ const router = express.Router();
 
 router.route("/api/users").get(userCtrl.list).post(userCtrl.create);
 
+//The listBugsByUser route will be used to retrieve all bugs assigned to a user. The listBugsByUser method in the controller will query the Bug model to find all bugs where the assignee field matches the userId in the request.
+router
+  .route("/api/users/:userId/bugs")
+  .get(authCtrl.requireSignin, userCtrl.listBugsByUser);
+
 //The update and remove routes require authentication and authorization while the read route requires only authentication.
 router
   .route("/api/users/:userId")

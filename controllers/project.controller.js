@@ -3,7 +3,7 @@ const extend = require("lodash/extend");
 const errorHandler = require("../helpers/dbErrorHandler");
 
 const create = async (req, res) => {
-  console.log("in create", req.body.memebers);
+  console.log("in create", req.body.members);
   const ProjectExist = await Project.exists({ name: req.body.name });
   if (ProjectExist) {
     return res
@@ -44,8 +44,8 @@ const projectByID = async (req, res, next, id) => {
   try {
     let project = await Project.findById(id);
     console.log("retrieved project", project);
-    if (!project) {
-      res.status(404).json({
+    if (!project || !id) {
+      return res.status(404).json({
         error: "Project not found",
       });
     }
@@ -61,8 +61,8 @@ const projectByName = async (req, res, next, name) => {
   try {
     let project = await Project.findOne({ name: name });
     console.log("retrieved project", project);
-    if (!project) {
-      res.status(404).json({
+    if (!project || !name) {
+      return res.status(404).json({
         error: "Project not found",
       });
     }
@@ -76,26 +76,38 @@ const projectByName = async (req, res, next, name) => {
 };
 
 const read = async (req, res) => {
-  const project = await Project.findOne({ _id: req.project._id })
-    .populate({
-      path: "bugs",
-      // populate: {
-      //   path: "assignedTo",
-      //   select: "name",
-      // },
-      select: "name description status priority status created updated _id",
-    })
-    .populate({
-      path: "members",
-      select: "name _id role",
-    })
-    .exec();
+  try {
+    const project = await Project.findById(req.project._id)
+      .populate({
+        path: "bugs",
+        // populate: {
+        //   path: "assignedTo",
+        //   select: "name",
+        // },
+        select: "name description status priority status created updated _id",
+      })
+      .populate({
+        path: "members",
+        select: "name _id role email",
+      })
+      .exec();
 
-  return res.json(project);
+    if (!project) {
+      return res.status("400").json({
+        error: "Project not found",
+      });
+    }
+    return res.json(project);
+  } catch (err) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(err),
+    });
+  }
 };
 
 const update = async (req, res) => {
   try {
+    console.log("in update", req.body);
     let project = req.project;
     project = extend(project, req.body);
     project.updated = Date.now();
@@ -113,6 +125,7 @@ const remove = async (req, res) => {
   try {
     let project = req.project;
     let deletedProject = await Project.deleteOne({ _id: project._id });
+    console.log("deleted project", deletedProject);
     res.json(deletedProject); // an object with acknowledged and deletedCount keys
   } catch (err) {
     return res.status(400).json({

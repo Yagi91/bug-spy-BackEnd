@@ -7,6 +7,8 @@ const referenceSwap = require("../helpers/ReferenceSwap.js");
 
 const create = async (req, res) => {
   const bug = new Bug(req.body);
+  // bug.priority =
+  //   bug.priority[0].toUpperCase() + bug.priority.slice(1).toLowerCase();
   const project = await Project.findById(req.body.project);
   const assignee = await User.findById(req.body.assignee);
   if (!project) {
@@ -15,7 +17,9 @@ const create = async (req, res) => {
       .json({ error: "Referenced project-Id is incorrect" });
   }
   try {
+    console.log("before");
     await bug.save();
+    console.log("after");
     project.bugs.push(bug._id);
     project.totalBugs += 1;
     await project.save();
@@ -44,6 +48,7 @@ const list = async (req, res) => {
 };
 
 const bugByID = async (req, res, next, id) => {
+  console.log("backend api", req.body, id);
   try {
     let bug = await Bug.findById(id);
     let project = await Project.findById(bug.project.toString());
@@ -77,6 +82,7 @@ const update = async (req, res) => {
   try {
     let bug = req.bug;
     let assignee = req.assignee;
+    console.log("in bug update", req.body);
     bug = extend(bug, req.body);
     bug.updated = Date.now();
     await bug.save();

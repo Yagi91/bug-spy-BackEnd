@@ -100,6 +100,24 @@ const remove = async (req, res) => {
   }
 };
 
+//list all bugs assigned to a user
+const listBugsByUser = async (req, res) => {
+  try {
+    let bugs = await User.find({ _id: req.profile._id })
+      .populate(
+        "bugs",
+        "_id title description status priority project created updated"
+      )
+      .populate("bugs.project", "_id name")
+      .sort("-created");
+    res.json(bugs);
+  } catch (err) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(err),
+    });
+  }
+};
+
 module.exports = {
   create,
   userByID,
@@ -107,4 +125,5 @@ module.exports = {
   list,
   remove,
   update,
+  listBugsByUser,
 };
