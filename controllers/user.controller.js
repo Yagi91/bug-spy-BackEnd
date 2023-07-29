@@ -41,7 +41,7 @@ const list = async (req, res) => {
 
 //find a user in the database by its id and store it in the request object as a user object,it executes fetch and loads before passing control to the next function thats specific to the request that came in
 const userByID = async (req, res, next, id) => {
-  //TODO: check the type of request so that delete request does not fetch the user
+  console.log("in userByID", id);
   try {
     let user = await User.findById(id);
     if (!user) {
@@ -100,24 +100,6 @@ const remove = async (req, res) => {
   }
 };
 
-//list all bugs assigned to a user
-const listBugsByUser = async (req, res) => {
-  try {
-    let bugs = await User.find({ _id: req.profile._id })
-      .populate(
-        "bugs",
-        "_id title description status priority project created updated"
-      )
-      .populate("bugs.project", "_id name")
-      .sort("-created");
-    res.json(bugs);
-  } catch (err) {
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err),
-    });
-  }
-};
-
 module.exports = {
   create,
   userByID,
@@ -125,5 +107,4 @@ module.exports = {
   list,
   remove,
   update,
-  listBugsByUser,
 };

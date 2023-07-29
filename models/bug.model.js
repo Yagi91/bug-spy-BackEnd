@@ -2,15 +2,6 @@ const mongoose = require("mongoose");
 
 const ObjectId = mongoose.Types.ObjectId;
 
-// const UserSchema = new mongoose.Schema({
-//   name: String,
-//   id: ObjectId,
-// });
-// const ProjectSchema = new mongoose.Schema({
-//   name: String,
-//   id: ObjectId,
-// });
-
 const BugSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -35,12 +26,14 @@ const BugSchema = new mongoose.Schema({
     required: "Status is required",
   },
   project: {
-    type: String,
+    type: ObjectId,
     required: "Referenced project id is required",
+    ref: "Project",
   },
   assignee: {
     type: ObjectId,
     required: "Name of assigned developer required",
+    ref: "User",
   },
   created: {
     type: Date,
@@ -55,13 +48,12 @@ BugSchema.set("validateBeforeSave", false);
 
 BugSchema.pre("save", async function (next) {
   console.log("in here");
-  this.bugs = new ObjectId(this.project);
+  this.project = new ObjectId(this.project);
   this.assignee = new ObjectId(this.assignee);
   this.priority =
     this.priority[0].toUpperCase() + this.priority.slice(1).toLowerCase();
   this.status =
     this.status[0].toUpperCase() + this.status.slice(1).toLowerCase();
-  console.log("bug status", this.status);
   this.validate();
   next();
 });

@@ -7,8 +7,6 @@ const referenceSwap = require("../helpers/ReferenceSwap.js");
 
 const create = async (req, res) => {
   const bug = new Bug(req.body);
-  // bug.priority =
-  //   bug.priority[0].toUpperCase() + bug.priority.slice(1).toLowerCase();
   const project = await Project.findById(req.body.project);
   const assignee = await User.findById(req.body.assignee);
   if (!project) {
@@ -58,6 +56,7 @@ const bugByID = async (req, res, next, id) => {
         error: "Bug not found",
       });
     }
+    console.log("bug", bug, project, assignee);
     if (!project || !assignee)
       return res.status(400).json({
         error: "Invalid Bug, ID's not associated to any project or assignee",
@@ -120,6 +119,29 @@ const remove = async (req, res) => {
   }
 };
 
+const listByAssignee = async (req, res) => {
+  try {
+    let assigneeId = req.params.assigneeId;
+    //sort created populate project and replace it with name of project the select the fields
+    let bugs = await Bug.find({ assignee: assigneeId })
+      .populate({
+        path: "project",
+        select: "name",
+      })
+      .sort({ created: -1 })
+      .select("_id name description priority status project updated created")
+      .exec();
+
+    console.log(bugs);
+    res.json(bugs);
+  } catch (err) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(err),
+    });
+  }
+};
+
+// .select("_id name description priority status project updated created");
 module.exports = {
   create,
   list,
@@ -127,4 +149,5 @@ module.exports = {
   read,
   update,
   remove,
+  listByAssignee,
 };
