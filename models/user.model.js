@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     trim: true,
-    unique: "Email already exists",
+    unique: true,
     match: [/.+\@.+\..+/, "Please fill a valid email address"],
     required: "Email is required",
   },
@@ -83,5 +83,13 @@ UserSchema.path("hashed_password").validate(function (v) {
     this.invalidate("password", "Password is required");
   }
 }, null);
+
+UserSchema.post("save", function (error, doc, next) {
+  if (error.name === "MongoError" && error.code === 11000) {
+    next(new Error("Email must be unique"));
+  } else {
+    next(error);
+  }
+});
 
 module.exports = mongoose.model("User", UserSchema);

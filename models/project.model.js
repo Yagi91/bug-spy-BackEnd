@@ -19,8 +19,9 @@ const ProjectSchema = new mongoose.Schema({
     default: "Ongoing",
   },
   admin: {
-    type: String,
+    type: ObjectId,
     required: "Admin name is required",
+    ref: "User",
   },
   members: {
     type: [ObjectId],
@@ -45,6 +46,7 @@ const ProjectSchema = new mongoose.Schema({
 
 ProjectSchema.pre("save", async function (next) {
   this.bugs = new ObjectId(this.bugs);
+  this.members = new ObjectId(this.members);
   next();
 });
 
