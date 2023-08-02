@@ -94,6 +94,10 @@ const read = async (req, res) => {
         path: "members",
         select: "name _id role email",
       })
+      .populate({
+        path: "admin",
+        select: "name _id",
+      })
       .exec();
 
     if (!project) {
