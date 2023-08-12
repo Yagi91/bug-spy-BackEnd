@@ -1,18 +1,18 @@
 const User = require("../models/user.model");
 const extend = require("lodash/extend");
 const errorHandler = require("../helpers/dbErrorHandler");
+const debug = require("debug")("bug-spy:user.controller.js");
 
 //create a new user in the database as a user object
 const create = async (req, res) => {
   const userExist = await User.exists({ email: req.body.email });
-  console.log("user-exist:", userExist);
   if (userExist)
     return res
       .status(400)
       .json({ error: "A user with this email already exist." });
 
   const user = new User(req.body);
-  console.log("in create", req.body);
+  debug("in create", req.body);
   try {
     await user.save();
     return res.status(200).json({
@@ -27,7 +27,7 @@ const create = async (req, res) => {
 
 //list all users in the database as an array of user objects
 const list = async (req, res) => {
-  console.log("in list", req.body);
+  debug("in list", req.body);
   try {
     let users = await User.find().select("name email role updated created"); //Find all users and only return the name, email, role, updated, and created fields
     res.json(users);
@@ -40,7 +40,7 @@ const list = async (req, res) => {
 
 //find a user in the database by its id and store it in the request object as a user object,it executes fetch and loads before passing control to the next function thats specific to the request that came in
 const userByID = async (req, res, next, id) => {
-  console.log("in userByID", id);
+  debug("in userByID", id);
   try {
     let user = await User.findById(id);
     if (!user) {
@@ -59,7 +59,7 @@ const userByID = async (req, res, next, id) => {
 
 //read a user from the database as a user object
 const read = async (req, res) => {
-  console.log("in read", req.body);
+  debug("in read", req.body);
   req.profile.hashed_password = undefined;
   req.profile.salt = undefined;
   return res.json(req.profile);
@@ -67,7 +67,7 @@ const read = async (req, res) => {
 
 //update a user in the database as a user object with the new information
 const update = async (req, res) => {
-  console.log("in update", req.body);
+  debug("in update", req.body);
   try {
     let user = req.profile;
     user = extend(user, req.body); //extend - Mutates the first object by copying the properties of the second object to it. It returns the mutated object.
@@ -85,7 +85,7 @@ const update = async (req, res) => {
 
 //delete a user from the database
 const remove = async (req, res) => {
-  console.log("in remove", req.body);
+  debug("in remove", req.body);
   try {
     let user = req.profile;
     let deletedUser = await User.deleteOne({ _id: user._id });

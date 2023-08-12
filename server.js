@@ -24,6 +24,6 @@ mongoose
   })
   .then(() => console.log("MongoDB Connected..."))
   .catch((err) => {
-    throw new Error(`Unable to connect to database: ${config.mongoUri}`);
     console.log(err);
+    throw new Error(`Unable to connect to database: ${config.mongoUri}`);
   });

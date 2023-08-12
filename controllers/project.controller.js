@@ -1,9 +1,10 @@
 const Project = require("../models/project.model");
 const extend = require("lodash/extend");
 const errorHandler = require("../helpers/dbErrorHandler");
+const debug = require("debug")("bug-spy:project.controller.js");
 
 const create = async (req, res) => {
-  console.log("in create", req.body.members);
+  debug("in create", req.body.members);
   const ProjectExist = await Project.exists({ name: req.body.name });
   if (ProjectExist) {
     return res
@@ -13,7 +14,7 @@ const create = async (req, res) => {
   const project = new Project(req.body);
   try {
     await project.save();
-    console.log("Successfully created", project);
+    debug("Successfully created", project);
     return res.status(200).json({
       name: project.name,
       _id: project._id,
@@ -23,11 +24,13 @@ const create = async (req, res) => {
       created: project.created,
     });
   } catch (err) {
+    debug("Error in creating project:", err);
     return res.status(400).json({ error: errorHandler.getErrorMessage(err) });
   }
 };
 
 const list = async (req, res) => {
+  debug("in list", req.body);
   try {
     const projects = await Project.find()
       .populate({
@@ -35,9 +38,9 @@ const list = async (req, res) => {
         select: "name _id",
       })
       .select("_id name admin totalBugs created description progress");
-    console.log("projects list", projects);
     return res.json(projects);
   } catch (err) {
+    debug("Error in listing projects:", err);
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });
@@ -46,8 +49,8 @@ const list = async (req, res) => {
 
 const projectByID = async (req, res, next, id) => {
   try {
+    debug("in projectByID", id);
     let project = await Project.findById(id);
-    console.log("retrieved project", project);
     if (!project || !id) {
       return res.status(404).json({
         error: "Project not found",
@@ -56,6 +59,7 @@ const projectByID = async (req, res, next, id) => {
     req.project = project;
     next();
   } catch (err) {
+    debug("Error in retrieving project", err);
     return res.status(400).json({
       error: "Could not retrieve user",
     });
@@ -64,15 +68,16 @@ const projectByID = async (req, res, next, id) => {
 const projectByName = async (req, res, next, name) => {
   try {
     let project = await Project.findOne({ name: name });
-    console.log("retrieved project", project);
     if (!project || !name) {
       return res.status(404).json({
         error: "Project not found",
       });
     }
     req.project = project;
+    debug("in projectByName, successfully retrieved project", project);
     next();
   } catch (err) {
+    debug("Error in retrieving project:", err);
     return res.status(400).json({
       error: "Could not retrieve user",
     });
@@ -105,8 +110,10 @@ const read = async (req, res) => {
         error: "Project not found",
       });
     }
+    debug("in read", project);
     return res.json(project);
   } catch (err) {
+    debug("Error in reading project:", err);
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });
@@ -115,17 +122,15 @@ const read = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    console.log("in update", req.body);
+    debug("in update", req.body);
     let project = req.project;
-    console.log("project", project);
     project = extend(project, req.body);
     project.updated = Date.now();
-    console.log("here");
     await project.save();
-    console.log("updated project", project);
+    debug("updated project", project);
     res.json(project);
   } catch (err) {
-    console.log(err);
+    debug("Error in updating project:", err);
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });
@@ -133,13 +138,14 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  console.log("in remove", req.body);
+  debug("in remove", req.body);
   try {
     let project = req.project;
     let deletedProject = await Project.deleteOne({ _id: project._id });
-    console.log("deleted project", deletedProject);
+    debug("deleted project", deletedProject);
     res.json(deletedProject); // an object with acknowledged and deletedCount keys
   } catch (err) {
+    debug("Error in deleting project:", err);
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });

@@ -2,6 +2,7 @@ const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const { expressjwt: expressJwt } = require("express-jwt");
 const config = require("../config/config");
+const debug = require("debug")("bug-spy:auth.controller.js");
 
 const signin = async (req, res) => {
   try {
@@ -26,6 +27,7 @@ const signin = async (req, res) => {
       },
     });
   } catch (err) {
+    debug("Error in signin:", err);
     return res.status(401).json({ error: "Could not sign in" });
   }
 };
@@ -46,10 +48,9 @@ const hasAuthorization = (req, res, next) => {
   //Checks if the authenticated user is the same as the user being updated or deleted before allowing the request to proceed
   const authorized = req.profile && req.auth && req.profile._id == req.auth._id; //req.profile is the user object that was loaded from the database in the userByID controller, req.auth is the payload of the JWT in the auth property of the request object, and req.profile._id is the id of the user being updated or deleted
   if (!authorized) {
-    console.log("user is not authorized", req.auth, req.profile);
     return res.status(403).json({ error: "User is not authorized" });
   }
-  console.log("user is authorized");
+  debug("user is authorized");
   next();
 };
 

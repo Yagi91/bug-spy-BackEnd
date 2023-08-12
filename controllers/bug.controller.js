@@ -4,6 +4,7 @@ const extend = require("lodash/extend");
 const errorHandler = require("../helpers/dbErrorHandler.js");
 const User = require("../models/user.model.js");
 const referenceSwap = require("../helpers/ReferenceSwap.js");
+const debug = require("debug")("bug-spy:bug.controller.js");
 
 const create = async (req, res) => {
   const bug = new Bug(req.body);
@@ -15,19 +16,17 @@ const create = async (req, res) => {
       .json({ error: "Referenced project-Id is incorrect" });
   }
   try {
-    console.log("before");
+    debug("in create", req.body);
     await bug.save();
-    console.log("after");
     project.bugs.push(bug._id);
     project.totalBugs += 1;
     await project.save();
     assignee.bugs.push(bug._id);
     await assignee.save();
-    console.log(bug);
-    console.log("Bug successfully reported");
+    debug("Bug successfully reported");
     return res.status(200).json(bug);
   } catch (err) {
-    console.log(err);
+    debug("Error in creating bug:", err);
     return res.status(400).json({ error: errorHandler.getErrorMessage(err) });
   }
 };
@@ -39,6 +38,7 @@ const list = async (req, res) => {
     );
     return res.json(bugs);
   } catch (err) {
+    debug("Error in listing bugs:", err);
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });
@@ -46,7 +46,7 @@ const list = async (req, res) => {
 };
 
 const bugByID = async (req, res, next, id) => {
-  console.log("backend api", req.body, id);
+  debug("in bugByID", id);
   try {
     let bug = await Bug.findById(id);
     let project = await Project.findById(bug.project.toString());
@@ -56,7 +56,6 @@ const bugByID = async (req, res, next, id) => {
         error: "Bug not found",
       });
     }
-    console.log("bug", bug, project, assignee);
     if (!project || !assignee)
       return res.status(400).json({
         error: "Invalid Bug, ID's not associated to any project or assignee",
@@ -67,6 +66,7 @@ const bugByID = async (req, res, next, id) => {
     req.assignee = assignee;
     next();
   } catch (err) {
+    debug("Error in bugByID", err);
     return res.status(400).json({
       error: "Could not retrieve bug",
     });
@@ -81,13 +81,15 @@ const update = async (req, res) => {
   try {
     let bug = req.bug;
     let assignee = req.assignee;
-    console.log("in bug update", req.body);
     bug = extend(bug, req.body);
     bug.updated = Date.now();
     await bug.save();
     referenceSwap.referenceSwap(assignee, "bugs", bug.assignee, User);
+    await assignee.save();
+    debug("Bug successfully updated", bug);
     res.json(bug);
   } catch (err) {
+    debug("Error in bug update:", err);
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });
@@ -111,8 +113,10 @@ const remove = async (req, res) => {
     assignee.bugs = updatedAssigneeBugs;
     await assignee.save();
     let deletedBug = await bug.remove();
+    debug("Bug successfully deleted", deletedBug);
     res.json(deletedBug);
   } catch (err) {
+    debug("Error in bug delete:", err);
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });
@@ -132,9 +136,10 @@ const listByAssignee = async (req, res) => {
       .select("_id name description priority status project updated created")
       .exec();
 
-    console.log(bugs);
+    debug("Bugs by assignee", bugs);
     res.json(bugs);
   } catch (err) {
+    debug("Error in listing bugs by assignee:", err);
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });

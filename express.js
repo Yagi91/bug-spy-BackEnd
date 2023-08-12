@@ -5,6 +5,7 @@ const corsOptions = require("./config/cors-params");
 const helmet = require("helmet");
 const compression = require("compression");
 const cookieParser = require("cookie-parser");
+const debug = require("debug")("bug-spy:express.js");
 
 const app = express();
 
@@ -23,11 +24,13 @@ app.use("/", require("./routes/bug.routes"));
 // Catch unauthorized errors
 app.use((err, req, res, next) => {
   if (err.name === "UnauthorizedError") {
-    console.log("UnauthorizedError", err);
+    // console.log("UnauthorizedError", err);
+    debug("UnauthorizedError", err);
     res.status(401).json({ error: err.name + ": " + err.message });
   } else if (err) {
     res.status(400).json({ error: err.name + ": " + err.message });
-    console.log(err);
+    // console.log(err);
+    debug(err);
   }
 });
 
