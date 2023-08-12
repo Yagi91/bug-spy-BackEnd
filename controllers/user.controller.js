@@ -3,7 +3,6 @@ const extend = require("lodash/extend");
 const errorHandler = require("../helpers/dbErrorHandler");
 
 //create a new user in the database as a user object
-//TODO: prevent creating a user with the same email as an existing user
 const create = async (req, res) => {
   const userExist = await User.exists({ email: req.body.email });
   console.log("user-exist:", userExist);
@@ -12,7 +11,7 @@ const create = async (req, res) => {
       .status(400)
       .json({ error: "A user with this email already exist." });
 
-  const user = new User(req.body); //TODO: edit the req.body to ensure the fields frontend sends are the same as the ones in the model
+  const user = new User(req.body);
   console.log("in create", req.body);
   try {
     await user.save();
@@ -61,8 +60,8 @@ const userByID = async (req, res, next, id) => {
 //read a user from the database as a user object
 const read = async (req, res) => {
   console.log("in read", req.body);
-  req.profile.hashed_password = undefined; //TODO: remove this line after testing
-  req.profile.salt = undefined; //TODO: remove this line after testing
+  req.profile.hashed_password = undefined;
+  req.profile.salt = undefined;
   return res.json(req.profile);
 };
 
@@ -74,8 +73,8 @@ const update = async (req, res) => {
     user = extend(user, req.body); //extend - Mutates the first object by copying the properties of the second object to it. It returns the mutated object.
     user.updated = Date.now();
     await user.save();
-    user.hashed_password = undefined; //TODO: remove this line after testing
-    user.salt = undefined; //TODO: remove this line after testing
+    user.hashed_password = undefined;
+    user.salt = undefined;
     res.json(user);
   } catch (err) {
     return res.status(400).json({

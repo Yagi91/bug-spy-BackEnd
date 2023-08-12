@@ -75,7 +75,11 @@ UserSchema.methods = {
 
 //UserSchema.path is a Mongoose schema property for defining custom validations for our schema paths.
 UserSchema.path("hashed_password").validate(function (v) {
-  if (this._password && this._password.length < 8) {
+  let re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+  if (
+    this._password &&
+    (this._password.length < 8 || !re.test(this._password))
+  ) {
     this.invalidate("password", "Password must be at least 8 characters.");
   }
   if (this.isNew && !this._password) {

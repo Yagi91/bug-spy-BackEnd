@@ -10,8 +10,8 @@ const signin = async (req, res) => {
       return res.status(401).json({ error: "User not found" });
     }
     if (!user.authenticate(req.body.password)) {
-      return res.status(401).send({ error: "Email and password don't match" });
-    } //TODO: change error message to something more secure like "Wrong email or password" or "Invalid email or password"
+      return res.status(401).send({ error: "Invalid email or password" });
+    }
 
     const token = jwt.sign({ _id: user._id }, config.jwtSecret);
     res.cookie("t", token, { expire: new Date() + 9999 }); //cookie expires in about 2.7 hours, "t" is the name of the cookie, token is cookie value, and the cookie is HTTP-only cookie which is the default for the cookie-parser module

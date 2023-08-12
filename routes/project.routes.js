@@ -8,11 +8,13 @@ router.route("/api/projects").get(projectCtrl.list).post(projectCtrl.create);
 
 router
   .route("/api/projects/:projectId")
-  .get(projectCtrl.read)
-  .put(projectCtrl.update)
-  .delete(projectCtrl.remove);
+  .get(authCtrl.requireSignin, projectCtrl.read)
+  .put(authCtrl.requireSignin, projectCtrl.update)
+  .delete(authCtrl.requireSignin, projectCtrl.remove);
 
-router.route("/api/projects/details/:projectName").get(projectCtrl.read);
+router
+  .route("/api/projects/details/:projectName")
+  .get(authCtrl.requireSignin, projectCtrl.read);
 
 router.param("projectId", projectCtrl.projectByID);
 router.param("projectName", projectCtrl.projectByName);

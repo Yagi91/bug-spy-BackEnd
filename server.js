@@ -2,6 +2,7 @@ const config = require("./config/config");
 const app = require("./express");
 const mongoose = require("mongoose");
 const template = require("./template");
+require("dotenv").config();
 
 app.listen(config.port, (err) => {
   if (err) {
