@@ -21,6 +21,7 @@ mongoose
   .connect(config.mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    dbName: "bug-spy",
   })
   .then(() => console.log("MongoDB Connected..."))
   .catch((err) => {

@@ -1,2 +1,5 @@
 runtime: nodejs16
 service: default
+
+includes:
+  - env_vars.yaml
