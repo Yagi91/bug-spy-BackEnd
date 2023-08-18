@@ -75,7 +75,7 @@ command to run if the program contains helper info
 
 Bryan Timah
 [LinkedIn](https://www.linkedin.com/in/bryan-timah/)
-[@DomPizzie:Twitter](https://twitter.com/D_africanknight)
+[@Bryan_coder:Twitter](https://twitter.com/D_africanknight)
 
 
 ## License
