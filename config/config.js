@@ -4,6 +4,7 @@ const config = {
   port: process.env.PORT || 5000,
   jwtSecret: process.env.JWT_SECRET || "YOUR_secret_key",
   mongoUri:
+  'mongodb+srv://bryantimah:XnAAMKNFIVLpuMt8@cluster0.uc3i8ea.mongodb.net/?retryWrites=true&w=majority'||
     process.env.MONGODB_URI ||
     process.env.MONGO_HOST ||
     "mongodb://" +

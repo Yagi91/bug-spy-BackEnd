@@ -30,6 +30,7 @@ const list = async (req, res) => {
   debug("in list", req.body);
   try {
     let users = await User.find().select("name email role updated created"); //Find all users and only return the name, email, role, updated, and created fields
+    debug(users);
     res.json(users);
   } catch (err) {
     return res.status(400).json({

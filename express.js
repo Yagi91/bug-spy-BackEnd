@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.use(cookieParser()); // parse cookie header and populate req.cookies with an object keyed by the cookie names
 app.use(compression()); // compress all responses
 app.use(helmet()); // secure apps by setting various HTTP headers
-app.set("trust proxy", true); //This is needed for rate limiting to work properly when behind a reverse proxy such as Heroku, Bluemix, AWS ELB, Nginx, etc
+app.set("trust proxy", false); // Set to true: If this is needed for rate limiting to work properly when behind a reverse proxy such as Heroku, Bluemix, AWS ELB, Nginx, etc
 app.use(limit); // Limit repeated requests to public APIs and/or endpoints such as password reset
 
 app.use("/", require("./routes/user.routes"));

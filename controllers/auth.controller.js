@@ -6,6 +6,7 @@ const debug = require("debug")("bug-spy:auth.controller.js");
 
 const signin = async (req, res) => {
   try {
+    console.log('body: ', req.body);
     let user = await User.findOne({ email: req.body.email });
     if (!user) {
       return res.status(401).json({ error: "User not found" });
