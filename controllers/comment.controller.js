@@ -98,21 +98,21 @@ const list = async (req, res) => {
 const listByBugId = async (req, res) => {
     try {
         // Fetch all comments related to a specific bug
-        const comments = await Comment.find({ bug: req.params.bugId }).exec();
+        const comments = await Comment.find({ bug: req.params.bugId }).sort('created').exec();
 
         // Create a map where the key is the comment's ID and the value is the comment object with an added `replies` array
         const commentMap = {};
         comments.forEach(comment => {
             commentMap[comment._id] = { ...comment._doc, replies: [] };
         });
-
+        console.log('commentMap:',commentMap);
         // Iterate over the map. For each comment, if it has a parent, add it to the parent's `replies` array
         Object.values(commentMap).forEach(comment => {
             if (comment.parentComment) {
                 commentMap[comment.parentComment].replies.push(comment);
             }
         });
-
+        console.log('after iter1 commentMap:',commentMap);
         // Filter out the top-level comments (those without a parent)
         const topLevelComments = Object.values(commentMap).filter(comment => !comment.parentComment);
 
