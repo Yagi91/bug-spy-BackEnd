@@ -98,7 +98,7 @@ const list = async (req, res) => {
 const listByBugId = async (req, res) => {
     try {
         // Fetch all comments related to a specific bug
-        const comments = await Comment.find({ bug: req.params.bugId }).sort('created').exec();
+        const comments = await Comment.find({ bug: req.params.bugId }).sort('created').populate('user').exec();
 
         // Create a map where the key is the comment's ID and the value is the comment object with an added `replies` array
         const commentMap = {};
