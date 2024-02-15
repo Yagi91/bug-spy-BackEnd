@@ -29,6 +29,7 @@ app.use("/", require("./routes/user.routes"));
 app.use("/", require("./routes/auth.routes"));
 app.use("/", require("./routes/project.routes"));
 app.use("/", require("./routes/bug.routes"));
+app.use("/", require("./routes/comment.routes"));
 
 // Catch unauthorized errors
 app.use((err, req, res, next) => {

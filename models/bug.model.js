@@ -44,7 +44,7 @@ const BugSchema = new mongoose.Schema({
   },
 });
 
-BugSchema.set("validateBeforeSave", false);
+BugSchema.set("validateBeforeSave", false);// the pre-save hook will validate the schema
 
 BugSchema.pre("save", async function (next) {
   console.log("in here");

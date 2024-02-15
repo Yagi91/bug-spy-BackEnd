@@ -41,7 +41,7 @@ const list = async (req, res) => {
 
 //find a user in the database by its id and store it in the request object as a user object,it executes fetch and loads before passing control to the next function thats specific to the request that came in
 const userByID = async (req, res, next, id) => {
-  debug("in userByID", id);
+  debug("Fetching User by ID: ", id);
   try {
     let user = await User.findById(id);
     if (!user) {
