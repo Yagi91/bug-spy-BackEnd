@@ -34,7 +34,7 @@ const create = async (req, res) => {
 const list = async (req, res) => {
   try {
     const bugs = await Bug.find().select(
-      "_id name description priority status project assignedTo updated created"
+      "_id name description priority status project assignee updated created"
     );
     return res.json(bugs);
   } catch (err) {

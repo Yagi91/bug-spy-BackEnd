@@ -65,6 +65,7 @@ const projectByID = async (req, res, next, id) => {
     });
   }
 };
+
 const projectByName = async (req, res, next, name) => {
   try {
     let project = await Project.findOne({ name: name });
@@ -89,11 +90,11 @@ const read = async (req, res) => {
     const project = await Project.findById(req.project._id)
       .populate({
         path: "bugs",
-        // populate: {
-        //   path: "assignedTo",
-        //   select: "name",
-        // },
-        select: "name description status priority status created updated _id",
+        populate: {
+          path: "assignee",
+          select: "name _id",
+        },
+        select: "name description status priority status assignee created updated _id",
       })
       .populate({
         path: "members",
@@ -104,6 +105,7 @@ const read = async (req, res) => {
         select: "name _id",
       })
       .exec();
+      console.log('Project model:',project);
 
     if (!project) {
       return res.status("400").json({
