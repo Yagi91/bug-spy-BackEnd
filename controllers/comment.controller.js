@@ -4,6 +4,7 @@ const User = require('../models/user.model');
 const errorHandler = require('../helpers/dbErrorHandler');
 const debug = require('debug')('bug-spy:comment.controller.js');
 const extend = require('lodash/extend');
+const mongoose = require('mongoose');
 
 
 const create = async (req, res) => {
@@ -56,46 +57,9 @@ const list = async (req, res) => {
     }
 };
 
-// const getReplies = (comment) => {
-//     if (!comment.replies.length) {//If there are no replies, return an empty array
-//         debug('No replies for comment:', comment);
-//         return [];
-//     }
-
-//     return comment.replies.map(reply => {//If there are replies, map through them and get their replies
-//         debug('Replies for comment:', comment.text, reply);
-//         return {
-//             ...reply._doc,
-//             replies: getReplies(reply)//Get the replies of the reply with a recursive function
-//         };
-//     });
-// };
-
-// const listByBugId = async (req, res) => {
-//     try {
-//         //Exempt the parentComment field from the query
-//         const comments = await Comment.find({ bug: req.params.bugId, parentComment: null })
-//             .populate('replies')
-//             .exec();
-//         debug('Fetched comments:', comments);
-
-//         // Create a tree structure of comments
-//         const commentsTree = comments.map(comment => {
-//             return {
-//                 ...comment._doc,//Exempt the replies field from the query
-//                 replies: getReplies(comment)//Get the replies of the comment with a recursive function
-//             };
-//         });
-//         res.json(commentsTree);
-//     } catch (err) {
-//         // return res.status(400).json({
-//         //     error: "Could not fetch comments"
-//         // });
-//         return res.status(400).json({ error: errorHandler.getErrorMessage(err) });
-//     }
-// };
 
 const listByBugId = async (req, res) => {
+    debug('listing comments by bug id: %s');
     try {
         // Fetch all comments related to a specific bug
         const comments = await Comment.find({ bug: req.params.bugId })
@@ -108,19 +72,27 @@ const listByBugId = async (req, res) => {
         comments.forEach(comment => {
             commentMap[comment._id] = { ...comment._doc, replies: [] };
         });
-        console.log('commentMap:',commentMap);
+        
         // Iterate over the map. For each comment, if it has a parent, add it to the parent's `replies` array
         Object.values(commentMap).forEach(comment => {
             if (comment.parentComment) {
-                commentMap[comment.parentComment].replies.push(comment);
+                // debug('Parent comment:',comment, commentMap[comment.parentComment]);
+                if (commentMap[comment.parentComment]) {
+                    commentMap[comment.parentComment].replies.push(comment);
+                } else {
+                    // Delete the comment if the parent comment is not available. This is to handle the case where a comment is a reply to a deleted comment and helps prevent orphaned comments
+                    delete commentMap[comment._id];
+                    Comment.deleteOne({ _id: comment._id }).exec();
+                }
             }
         });
-        console.log('after iter1 commentMap:',commentMap);
+        
         // Filter out the top-level comments (those without a parent)
         const topLevelComments = Object.values(commentMap).filter(comment => !comment.parentComment);
-
+        debug('Fetched comments Succesffully');
         res.json(topLevelComments);
     } catch (err) {
+        console.log(err);
         return res.status(400).json({
             error: "Could not fetch comments"
         });
@@ -141,7 +113,9 @@ const commentByID = async (req, res, next, id) => {
         next();
     }
     catch (err) {
-        return res.status(400).json({ error: errorHandler.getErrorMessage(err) });
+        return res.status(400).json({
+            error: "Could not fetch comment"
+        });
     }
 }
 
@@ -157,25 +131,51 @@ const update = async (req, res) => {
         debug('Comment successfully updated');
         return res.status(200).json(comment);
     } catch (err) {
-        return res.status(400).json({ error: errorHandler.getErrorMessage(err) });
+        return res.status(400).json({ error: errorHandler.getErrorMessage(err) || 'Could not update comment' });
     }
 };
 
 const remove = async (req, res) => {
-    let comment = req.comment;
+    const { comment } = req;
     debug('Removing comment:', comment);
-    try {
-        let deletedComment = await Comment.deleteOne({_id: comment._id});
-        let parentComment = await Comment.findById(deletedComment.parentComment);
-        if (parentComment) {
-            parentComment.replies.pull(deletedComment._id);
-            await parentComment.save();
+
+    // Extracted the deletion of a single comment into a separate function
+    const deleteComment = async (commentId) => {
+        await Comment.deleteOne({ _id: commentId });
+    };
+
+    // Recursive function to delete a comment and its replies
+    const deleteCommentTree = async (comment) => {
+        console.log(comment);
+        if (comment.replies.length) {
+            await Promise.all(comment.replies.map(async (reply) => {
+                if (mongoose.Types.ObjectId.isValid(reply)) {
+                    const replyComment = await Comment.findById(reply);
+                    if (replyComment) {
+                        await deleteCommentTree(replyComment);
+                    }
+                }
+            }));
         }
+        await deleteComment(comment._id);
+    };
+
+    try {
+        await deleteCommentTree(comment);
         debug('Comment successfully deleted');
-        return res.status(200).json(deletedComment);
+
+        if (comment.parentComment) {
+            const parentComment = await Comment.findById(comment.parentComment);
+            if (parentComment) {
+                parentComment.replies.pull(comment._id);
+                await parentComment.save();
+            }
+        }
+
+        return res.status(200).json(comment);
     } catch (err) {
         console.log(err);
-        return res.status(400).json({ error: errorHandler.getErrorMessage(err) });
+        return res.status(400).json({ error: errorHandler.getErrorMessage(err) || 'Could not delete comment' });
     }
 };
 
