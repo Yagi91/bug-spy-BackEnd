@@ -10,8 +10,8 @@ const mongoose = require('mongoose');
 const create = async (req, res) => {
     const comment = new Comment(req.body);
     const bug = await Bug.findById(req.body.bug);
-    debug('Fetched bug:', bug);
-    debug('Fetched user:', req.body.user);
+    debug('Fetched bug');
+    debug('Fetched user:');
     const user = await User.findById(req.body.user);
     debug('creating comment:', req.body);
     if (!bug || !user) {
@@ -23,7 +23,6 @@ const create = async (req, res) => {
         if (!parentComment) {
             return res.status(400).json({ error: 'Referenced parent comment id is incorrect' });
         };
-        debug('Parent comment:', parentComment);
         comment.level = parentComment.level + 1;
         // check if the level of nesting is not more than 3
         if( comment.level > 3) {
@@ -34,7 +33,7 @@ const create = async (req, res) => {
             return res.status(400).json({ error: 'Parent comment and comment should belong to same bug' });
         }
         parentComment.replies.push(comment._id);
-        debug('Updated parent comment:', parentComment);
+        debug('Updated parent comment');
         await parentComment.save();
     }
     try {
@@ -59,7 +58,6 @@ const list = async (req, res) => {
 
 
 const listByBugId = async (req, res) => {
-    debug('listing comments by bug id: %s');
     try {
         // Fetch all comments related to a specific bug
         const comments = await Comment.find({ bug: req.params.bugId })
@@ -76,7 +74,6 @@ const listByBugId = async (req, res) => {
         // Iterate over the map. For each comment, if it has a parent, add it to the parent's `replies` array
         Object.values(commentMap).forEach(comment => {
             if (comment.parentComment) {
-                // debug('Parent comment:',comment, commentMap[comment.parentComment]);
                 if (commentMap[comment.parentComment]) {
                     commentMap[comment.parentComment].replies.push(comment);
                 } else {
@@ -92,7 +89,6 @@ const listByBugId = async (req, res) => {
         debug('Fetched comments Succesffully');
         res.json(topLevelComments);
     } catch (err) {
-        console.log(err);
         return res.status(400).json({
             error: "Could not fetch comments"
         });
@@ -107,12 +103,13 @@ const commentByID = async (req, res, next, id) => {
             return res.status(404).json({ error: 'Comment not found' });
         }
         let profile = await User.findById(comment.user);
-        debug('Fetched comment:', comment);
+        debug('Fetched comment';
         req.comment = comment;
         req.profile = profile;
         next();
     }
     catch (err) {
+        debug('Error in fetching comment');
         return res.status(400).json({
             error: "Could not fetch comment"
         });
@@ -131,13 +128,14 @@ const update = async (req, res) => {
         debug('Comment successfully updated');
         return res.status(200).json(comment);
     } catch (err) {
+        debug('Error in updating comment');
         return res.status(400).json({ error: errorHandler.getErrorMessage(err) || 'Could not update comment' });
     }
 };
 
 const remove = async (req, res) => {
     const { comment } = req;
-    debug('Removing comment:', comment);
+    debug('Removing comment');
 
     // Extracted the deletion of a single comment into a separate function
     const deleteComment = async (commentId) => {
@@ -146,7 +144,6 @@ const remove = async (req, res) => {
 
     // Recursive function to delete a comment and its replies
     const deleteCommentTree = async (comment) => {
-        console.log(comment);
         if (comment.replies.length) {
             await Promise.all(comment.replies.map(async (reply) => {
                 if (mongoose.Types.ObjectId.isValid(reply)) {
@@ -174,7 +171,7 @@ const remove = async (req, res) => {
 
         return res.status(200).json(comment);
     } catch (err) {
-        console.log(err);
+        debug('Error in deleting comment');
         return res.status(400).json({ error: errorHandler.getErrorMessage(err) || 'Could not delete comment' });
     }
 };

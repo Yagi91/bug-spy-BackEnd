@@ -24,7 +24,7 @@ const create = async (req, res) => {
       created: project.created,
     });
   } catch (err) {
-    debug("Error in creating project:", err);
+    debug("Error in creating project:", errorHandler.getErrorMessage(err));
     return res.status(400).json({ error: errorHandler.getErrorMessage(err) });
   }
 };
@@ -105,17 +105,15 @@ const read = async (req, res) => {
         select: "name _id",
       })
       .exec();
-      console.log('Project model:',project);
 
     if (!project) {
       return res.status("400").json({
         error: "Project not found",
       });
     }
-    debug("in read", project);
     return res.json(project);
   } catch (err) {
-    debug("Error in reading project:", err);
+    debug("Error in reading project");
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });
@@ -124,15 +122,15 @@ const read = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    debug("in update", req.body);
+    debug("in updating project");
     let project = req.project;
     project = extend(project, req.body);
     project.updated = Date.now();
     await project.save();
-    debug("updated project", project);
+    debug("updated project");
     res.json(project);
   } catch (err) {
-    debug("Error in updating project:", err);
+    debug("Error in updating project:", errorHandler.getErrorMessage(err));
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });
@@ -140,14 +138,14 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  debug("in remove", req.body);
+  debug("Removing Project");
   try {
     let project = req.project;
     let deletedProject = await Project.deleteOne({ _id: project._id });
-    debug("deleted project", deletedProject);
+    debug("deleted project");
     res.json(deletedProject); // an object with acknowledged and deletedCount keys
   } catch (err) {
-    debug("Error in deleting project:", err);
+    debug("Error in deleting project:", errorHandler.getErrorMessage(err));
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });

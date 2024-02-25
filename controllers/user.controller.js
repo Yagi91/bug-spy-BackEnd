@@ -12,7 +12,7 @@ const create = async (req, res) => {
       .json({ error: "A user with this email already exist." });
 
   const user = new User(req.body);
-  debug("in create", req.body);
+  debug("Creating User: ", req.body.name, "with email: ", req.body.email);
   try {
     await user.save();
     return res.status(200).json({
@@ -33,6 +33,7 @@ const list = async (req, res) => {
     debug(users);
     res.json(users);
   } catch (err) {
+    debug("Error in listing users:", errorHandler.getErrorMessage(err));
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });
@@ -52,6 +53,7 @@ const userByID = async (req, res, next, id) => {
     req.profile = user;
     next();
   } catch (err) {
+    debug("Error in fetching user by ID:", errorHandler.getErrorMessage(err));
     return res.status(400).json({
       error: "Could not retrieve user",
     });
@@ -68,7 +70,7 @@ const read = async (req, res) => {
 
 //update a user in the database as a user object with the new information
 const update = async (req, res) => {
-  debug("in update", req.body);
+  debug("Updating User", req.body.name);
   try {
     let user = req.profile;
     user = extend(user, req.body); //extend - Mutates the first object by copying the properties of the second object to it. It returns the mutated object.
@@ -86,7 +88,7 @@ const update = async (req, res) => {
 
 //delete a user from the database
 const remove = async (req, res) => {
-  debug("in remove", req.body);
+  debug("Removing User");
   try {
     let user = req.profile;
     let deletedUser = await User.deleteOne({ _id: user._id });
@@ -94,6 +96,7 @@ const remove = async (req, res) => {
     deletedUser.salt = undefined;
     res.json(deletedUser);
   } catch (err) {
+    debug('Error in removing comment');
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err),
     });
