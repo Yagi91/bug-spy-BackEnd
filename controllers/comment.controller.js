@@ -103,7 +103,7 @@ const commentByID = async (req, res, next, id) => {
             return res.status(404).json({ error: 'Comment not found' });
         }
         let profile = await User.findById(comment.user);
-        debug('Fetched comment';
+        debug('Fetched comment');
         req.comment = comment;
         req.profile = profile;
         next();
