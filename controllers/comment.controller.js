@@ -11,7 +11,7 @@ const create = async (req, res) => {
     const comment = new Comment(req.body);
     const bug = await Bug.findById(req.body.bug);
     debug('Fetched bug');
-    debug('Fetched user:');
+    debug('Fetched user');
     const user = await User.findById(req.body.user);
     debug('creating comment:', req.body);
     if (!bug || !user) {
